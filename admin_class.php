@@ -298,8 +298,71 @@ Class Action {
 			return 1;
 		}
 	}
+	// function save_progress(){
+	// 	extract($_POST);
+	// 	$data = "";
+	// 	foreach($_POST as $k => $v){
+	// 		if(!in_array($k, array('id')) && !is_numeric($k)){
+	// 			if($k == 'comment')
+	// 				$v = htmlentities(str_replace("'","&#x2019;",$v));
+	// 			if(empty($data)){
+	// 				$data .= " $k='$v' ";
+	// 			}else{
+	// 				$data .= ", $k='$v' ";
+	// 			}
+	// 		}
+	// 	}
+	// 	$dur = abs(strtotime("2020-01-01 ".$end_time)) - abs(strtotime("2020-01-01 ".$start_time));
+	// 	$dur = $dur / (60 * 60);
+	// 	$data .= ", time_rendered='$dur' ";
+	// 	// echo "INSERT INTO user_productivity set $data"; exit;
+	// 	if(empty($id)){
+	// 		$data .= ", user_id={$_SESSION['login_id']} ";
+			
+	// 		$save = $this->db->query("INSERT INTO user_productivity set $data");
+	// 	}else{
+	// 		$save = $this->db->query("UPDATE user_productivity set $data where id = $id");
+	// 	}
+	// 	if($save){
+	// 		return 1;
+	// 	}
+	// }
 	function save_progress(){
 		extract($_POST);
+	
+		// Upload file
+		$target_dir = "uploads/"; // Nama folder tujuan penyimpanan file
+		$target_file = $target_dir . basename($_FILES["file"]["name"]);
+		$uploadOk = 1;
+		$imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
+	
+		// Check jika file sudah ada
+		if (file_exists($target_file)) {
+			echo "File already exists.";
+			$uploadOk = 0;
+		}
+	
+		// Check jenis file
+		if($imageFileType != "pdf" && $imageFileType != "doc" && $imageFileType != "docx" && $imageFileType != "xlsx" && $imageFileType != "png" && $imageFileType != "jpg") {
+			echo "Only PDF, DOC,PNG , JPG and DOCX files are allowed.";
+			$uploadOk = 0;
+		}
+	
+		// Check jika $uploadOk bernilai 0
+		if ($uploadOk == 0) {
+			echo "File was not uploaded.";
+		// Jika semua kondisi terpenuhi, maka lakukan upload file
+		} else {
+			if (move_uploaded_file($_FILES["file"]["tmp_name"], $target_file)) {
+				// echo "The file ". basename( $_FILES["file"]["name"]). " has been uploaded.";
+	
+				// Simpan direktori file ke dalam database
+				$directory = $target_file;
+			} else {
+				echo "There was an error uploading the file.";
+			}
+		}
+	
 		$data = "";
 		foreach($_POST as $k => $v){
 			if(!in_array($k, array('id')) && !is_numeric($k)){
@@ -315,18 +378,24 @@ Class Action {
 		$dur = abs(strtotime("2020-01-01 ".$end_time)) - abs(strtotime("2020-01-01 ".$start_time));
 		$dur = $dur / (60 * 60);
 		$data .= ", time_rendered='$dur' ";
-		// echo "INSERT INTO user_productivity set $data"; exit;
+	
+		// Tambahkan juga field 'file_directory' ke dalam string $data
+		$data .= ", file_directory='$directory' ";
+	
 		if(empty($id)){
 			$data .= ", user_id={$_SESSION['login_id']} ";
-			
-			$save = $this->db->query("INSERT INTO user_productivity set $data");
+	
+			$save = $this->db->query("INSERT INTO user_productivity SET $data");
 		}else{
-			$save = $this->db->query("UPDATE user_productivity set $data where id = $id");
+			$save = $this->db->query("UPDATE user_productivity SET $data WHERE id = $id");
 		}
+	
 		if($save){
 			return 1;
 		}
 	}
+	
+	
 	function delete_progress(){
 		extract($_POST);
 		$delete = $this->db->query("DELETE FROM user_productivity where id = $id");

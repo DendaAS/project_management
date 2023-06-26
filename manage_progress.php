@@ -8,7 +8,7 @@ if(isset($_GET['id'])){
 }
 ?>
 <div class="container-fluid">
-	<form action="" id="manage-progress">
+	<form action="" id="manage-progress" enctype="multipart/form-data">
 		<input type="hidden" name="id" value="<?php echo isset($id) ? $id : '' ?>">
 		<input type="hidden" name="project_id" value="<?php echo isset($_GET['pid']) ? $_GET['pid'] : '' ?>">
 		<div class="col-lg-12">
@@ -45,6 +45,10 @@ if(isset($_GET['id'])){
 					<div class="form-group">
 						<label for="">End Time</label>
 						<input type="time" class="form-control form-control-sm" name="end_time" value="<?php echo isset($end_time) ? date("H:i",strtotime("2020-01-01 ".$end_time)) : '' ?>" required>
+					</div>
+					<div class="form-group">
+						<label for="">File</label>
+						<input type="file" class="form-control form-control-sm" name="file">
 					</div>
 				</div>
 				<div class="col-md-7">
